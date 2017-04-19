@@ -1,0 +1,17 @@
+{
+  "name": "expenses_report",
+  "version": "1.0.0",
+  "description": "สร้างรายงานค่าใช้จ่าย\r",
+  "main": "index.js",
+  "dependencies": {
+    "dateformat": "^2.0.0",
+    "lodash": "^4.17.4",
+    "pdfkit": "^0.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rainviper7",
+  "license": "ISC"
+}
