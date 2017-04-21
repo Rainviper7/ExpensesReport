@@ -20,13 +20,6 @@ var hilight = false;
 var row_hilight = 0;
 var row_p1 = ROW_DEFAULT;
 var totalchartnewlinespace = FONT_SIZE_BIG + TEXT_SPACE_LOWER
-var CatalogFiltered;
-var itemfillter;
-var subitemfillter;
-var ToppingGroupsFiltered;
-var ToppingItemsFiltered;
-var DeleteGroupsFiltered;
-var DeleteItemFiltered;
 var ExpensesGroupFiltered;
 var ExpensesItemFiltered;
 var footerGrandtotal;
@@ -94,7 +87,6 @@ var TAB_TABLE_EXPENSES_GROUP = {
 }
 var TAB_TABLE_EXPENSES = {
     INDEX: 45,
-    NAME: 65,
     AMOUNT: 235,
     PERCENT: 305,
     LAST: 375
@@ -102,10 +94,27 @@ var TAB_TABLE_EXPENSES = {
 
 var TAB_EXPENSES = {
     INDEX: TAB_TABLE_EXPENSES.INDEX + 5,
-    NAME: TAB_TABLE_EXPENSES.NAME + 5,
+    NAME: 65 + 5, //fixcode
     AMOUNT: TAB_TABLE_EXPENSES.AMOUNT + 5,
     PERCENT: TAB_TABLE_EXPENSES.PERCENT + 5,
     LAST: TAB_TABLE_EXPENSES.LAST - 5
+}
+
+var TAB_TABLE_EXPENSES_DETAIL_GROUP = {
+    INDEX: 45,
+    // AMOUNT: 235,
+    LAST: 305
+}
+var TAB_TABLE_EXPENSES_DETAIL = {
+    INDEX: 45,
+    // AMOUNT: 235,
+    LAST: 305,
+}
+
+var TAB_EXPENSES_DETAIL = {
+    INDEX: TAB_TABLE_EXPENSES_DETAIL.INDEX + 5,
+    AMOUNT: 235 + 5, //fixcode
+    LAST: TAB_TABLE_EXPENSES_DETAIL.LAST - 5
 }
 
 var TAB_TABLE_CHART_TOTAL = {
@@ -141,6 +150,9 @@ function Report(pathPdf, data) {
     var fontpath = path.join(__dirname, 'fonts', 'ARIALUNI.ttf');
     var fontpath_bold = path.join(__dirname, 'fonts', 'arialbd.ttf');
     var fontpath_bold_bath = path.join(__dirname, 'fonts', 'cambriab.ttf');
+
+    var dateFrom = dateFormat(data.From, "dd mmmm yyyy");
+    var dateTo = dateFormat(data.To, "dd mmmm yyyy");
 
     dailyReport.registerFont('font_style_normal', fontpath, '')
     dailyReport.registerFont('font_style_bold', fontpath_bold, '')
@@ -190,10 +202,10 @@ function Report(pathPdf, data) {
                 align: 'left'
             });
 
-        NewLine(TEXT_SPACE + 5);
+        NewLine(FONT_SIZE_HEADER + TEXT_SPACE);
 
-        dailyReport.fontSize(FONT_SIZE_HEADER)
-            .text("From : " + dateFormat(data.From, "dd/mm/yyyy"), TAB_TABLE
+        dailyReport.fontSize(FONT_SIZE_BIG)
+            .text("From : " +dateFrom, TAB_TABLE
                 .INDEX, ROW_CURRENT, {
                 width: TAB_TABLE
                     .LAST - TAB_TABLE
@@ -201,10 +213,10 @@ function Report(pathPdf, data) {
                 align: 'left'
             });
 
-        NewLine(TEXT_SPACE + 5);
+        NewLine(TEXT_SPACE);
 
-        dailyReport.fontSize(FONT_SIZE_HEADER)
-            .text("To : " + dateFormat(data.To, "dd/mm/yyyy"), TAB_TABLE
+        dailyReport.fontSize(FONT_SIZE_BIG)
+            .text("To : " + dateTo, TAB_TABLE
                 .INDEX, ROW_CURRENT, {
                 width: TAB_TABLE
                     .LAST - TAB_TABLE
@@ -229,40 +241,12 @@ function Report(pathPdf, data) {
         
         NewLine(TEXT_SPACE + 5);
 
-        // NewLine(FONT_SIZE_HEADER * 2 + TEXT_SPACE_LOWER);
-
-        // //--chart
-        // row_p1 = ROW_CURRENT;
-        // row_hilight = row_p1;
-        // hilight = true;
-
-        // if (hilight) {
-
-        //     dailyReport.rect(TAB_TABLE_CHART_TOTAL.NAME,
-        //         row_hilight - 5, (TAB_TABLE_CHART_TOTAL.LAST - TAB_TABLE_CHART_TOTAL.NAME),
-        //         101 + 15).fill('#ddd'); //--fixcode
-
-        //     dailyReport.fill('black');
-
-        // }
-
-        // addTotalchart();
-        // addDetailChart();
-
-        // row_hilight = 0;
-        // hilight = false;
-
-
-        // if (row_p1 > ROW_CURRENT) {
-        //     ROW_CURRENT = row_p1;
-        // }
-        // NewLine(FONT_SIZE_HEADER + TEXT_SPACE_LOWER);
-
     }
+
     function drawBody() {
         //--Menu
 
-        console.log("- building Menu ");
+        console.log("- building Expenses summary ");
 
         //-----Expenses
         ExpensesGroupFiltered = _.filter(data.Expenses, function (c) {
@@ -277,23 +261,6 @@ function Report(pathPdf, data) {
 
             NewLine(TEXT_SPACE);
 
-            // dailyReport.fontSize(FONT_SIZE_HEADER)
-            //     .text("Expenses", TAB_TABLE
-            //         .INDEX, ROW_CURRENT, {
-            //         width: TAB_TABLE
-            //             .QUANTITY - TAB_TABLE
-            //             .INDEX,
-            //         align: 'left'
-            //     })
-            //     .text("-฿ " + numberWithCommas(data.Expense), TAB_TABLE
-            //         .INDEX, ROW_CURRENT, {
-            //         width: TAB_TABLE
-            //             .LAST - TAB_TABLE
-            //             .INDEX,
-            //         align: 'right'
-            //     });
-            // NewLine(FONT_SIZE_HEADER + TEXT_SPACE_LOWER * 2);
-
             _.forEach(ExpensesGroupFiltered, function (expgroug, key) {
 
                 addTableLine(TAB_TABLE_EXPENSES_GROUP
@@ -301,7 +268,6 @@ function Report(pathPdf, data) {
                         .LAST, ROW_CURRENT); //row line
 
                 addExpensesGroups(expgroug);
-
 
                 _.forEach(TAB_TABLE_EXPENSES_GROUP, function (value, key) {
                     addColumnLine(value);
@@ -342,6 +308,91 @@ function Report(pathPdf, data) {
 
                 });
 
+                // NewLine(TEXT_SPACE);
+
+            });
+
+            // NewLine(TEXT_SPACE);
+
+        }
+
+        dailyReport.fillColor('black');
+
+
+        //-----Expenses by date
+        console.log("- building Expenses detail ");
+        ExpensesGroupFiltered = _.filter(data.Expenses, function (c) {
+            var dateCurrent = dateFormat(c.DateTime, "dd mmmm yyyy");
+            return dateCurrent >= dateFrom && dateCurrent <= dateTo;
+        });
+
+        if (ExpensesGroupFiltered.length == 0) {
+
+        }
+
+        else {
+
+             NewLine(TEXT_SPACE);
+
+             dailyReport.fontSize(FONT_SIZE_HEADER)
+            .text("Detail", TAB_TABLE
+                .INDEX, ROW_CURRENT, {
+                width: TAB_TABLE
+                    .LAST - TAB_TABLE
+                    .INDEX,
+                align: 'left'
+            });
+
+        NewLine(TEXT_SPACE + 5);
+
+            _.forEach(ExpensesGroupFiltered, function (expgroug, key) {
+
+                addTableLine(TAB_TABLE_EXPENSES_DETAIL_GROUP
+                    .INDEX, ROW_CURRENT, TAB_TABLE_EXPENSES_DETAIL_GROUP
+                        .LAST, ROW_CURRENT); //row line
+
+                addExpensesDetailGroups(expgroug);
+
+
+                _.forEach(TAB_TABLE_EXPENSES_DETAIL_GROUP, function (value, key) {
+                    addColumnLine(value);
+                })
+
+                NewLine(TEXT_SPACE);
+
+                checkPositionOutsideArea();
+
+                ExpensesItemFiltered = _.filter(expgroug.Items, function (c) {
+                    return c.Amount != 0 && c.Quantity != 0;
+                });
+
+                _.forEach(ExpensesItemFiltered, function (expitem, key) {
+
+                    if (((key + 1) % 2) == 1) {
+
+                        addHilightExpenceDetail(ROW_CURRENT, TEXT_SPACE);
+
+                    }
+
+                    addTableLine(TAB_TABLE_EXPENSES_DETAIL_GROUP
+                        .INDEX, ROW_CURRENT, TAB_TABLE_EXPENSES_DETAIL_GROUP
+                            .LAST, ROW_CURRENT); //row line
+
+                    addExpensesDetailItems(expgroug,expitem, key);//--text
+
+                    _.forEach(TAB_TABLE_EXPENSES_DETAIL
+                        , function (value, key) {
+                            addColumnLine(value);
+                        })
+
+                    NewLine(TEXT_SPACE);
+
+                    addTableLine(TAB_TABLE_EXPENSES_DETAIL
+                        .INDEX, ROW_CURRENT, TAB_TABLE_EXPENSES_DETAIL
+                            .LAST, ROW_CURRENT); //row line
+
+                });
+
                 NewLine(TEXT_SPACE);
 
             });
@@ -358,6 +409,27 @@ function Report(pathPdf, data) {
             NewLine(FONT_SIZE + TEXT_SPACE_LOWER * 2);
 
         }
+
+        addTableLine(TAB_TABLE
+            .INDEX, ROW_CURRENT, TAB_TABLE
+                .LAST, ROW_CURRENT); //row line
+        addTableLine(TAB_TABLE
+            .INDEX, ROW_CURRENT + 3, TAB_TABLE
+                .LAST, ROW_CURRENT + 3); //row line
+
+        NewLine(FONT_SIZE_SMALL);
+        dailyReport.fontSize(FONT_SIZE_SMALL).fillColor('gray')
+            .text("Genearated at : " + datetime, TAB_TABLE
+                .INDEX, ROW_CURRENT, {
+                width: TAB_TABLE
+                    .QUANTITY - TAB_TABLE
+                    .INDEX,
+                align: 'left'
+            });
+
+        dailyReport.fillColor('black');
+
+    }
 
         function drawFooter() {
 
@@ -386,28 +458,6 @@ function Report(pathPdf, data) {
             NewLine(FONT_SIZE_HEADER + TEXT_SPACE_LOWER * 2);
 
         }
-
-        addTableLine(TAB_TABLE
-            .INDEX, ROW_CURRENT, TAB_TABLE
-                .LAST, ROW_CURRENT); //row line
-        addTableLine(TAB_TABLE
-            .INDEX, ROW_CURRENT + 3, TAB_TABLE
-                .LAST, ROW_CURRENT + 3); //row line
-
-        NewLine(FONT_SIZE_SMALL);
-        dailyReport.fontSize(FONT_SIZE_SMALL).fillColor('gray')
-            .text("Genearated at : " + datetime, TAB_TABLE
-                .INDEX, ROW_CURRENT, {
-                width: TAB_TABLE
-                    .QUANTITY - TAB_TABLE
-                    .INDEX,
-                align: 'left'
-            });
-
-        dailyReport.fillColor('black');
-
-    }
-
     function addTotalchart() {
 
         row_p1 += TEXT_SPACE_LOWER;
@@ -631,20 +681,6 @@ function Report(pathPdf, data) {
     function addExpensesGroups(Expensesgroup) {
 
         dailyReport.fontSize(FONT_SIZE)
-            .text('', TAB_EXPENSES.INDEX, ROW_CURRENT)
-            .text("Amount", TAB_EXPENSES.AMOUNT, ROW_CURRENT)
-            .text("Percent", TAB_EXPENSES.PERCENT, ROW_CURRENT, {
-                width: TAB_EXPENSES.LAST - TAB_EXPENSES.PERCENT,
-                align: 'right'
-            });
-
-        _.forEach(TAB_TABLE_EXPENSES_GROUP, function (value, key) {
-            addColumnLine(value);
-        })
-
-        NewLine(TEXT_SPACE);
-
-        dailyReport.fontSize(FONT_SIZE)
             .text(Expensesgroup.Name, TAB_EXPENSES.INDEX, ROW_CURRENT)
             .text("฿ " + numberWithCommas(Expensesgroup.Amount), TAB_EXPENSES.AMOUNT, ROW_CURRENT)
             .text((Expensesgroup.Percent * 100).toFixed(2) + '%', TAB_EXPENSES.PERCENT, ROW_CURRENT, {
@@ -656,7 +692,6 @@ function Report(pathPdf, data) {
 
     function addExpensesItems(item, key) {
         dailyReport.fontSize(FONT_SIZE)
-            .text(key + 1 + '.', TAB_EXPENSES.INDEX, ROW_CURRENT)
             .text(item.Name, TAB_EXPENSES.NAME, ROW_CURRENT)
             .text("฿ " + numberWithCommas(item.Amount), TAB_EXPENSES.AMOUNT, ROW_CURRENT, {
                 width: TAB_EXPENSES.PERCENT - 10 - TAB_EXPENSES.AMOUNT,
@@ -667,6 +702,35 @@ function Report(pathPdf, data) {
                 align: 'right'
             });
 
+    }
+
+        function addExpensesDetailGroups(Expensesgroup) {
+
+        dailyReport.fontSize(FONT_SIZE)
+            .text( dateFormat(Expensesgroup.DateTime, "dd mmmm yyyy"), TAB_EXPENSES_DETAIL.INDEX, ROW_CURRENT)
+            .text("฿ " + numberWithCommas(Expensesgroup.Amount), TAB_EXPENSES_DETAIL.AMOUNT, ROW_CURRENT,{
+                width: TAB_EXPENSES_DETAIL.LAST - TAB_EXPENSES_DETAIL.AMOUNT,
+                align: 'right'
+            });
+
+    }
+
+       function addExpensesDetailItems(Expensesgroup,item, key) {
+        dailyReport.fontSize(FONT_SIZE)
+            
+            .text("    "+Expensesgroup.Name+" -- "+item.Name, TAB_EXPENSES_DETAIL.INDEX, ROW_CURRENT)
+            .text("฿ " + numberWithCommas(item.Amount), TAB_EXPENSES_DETAIL.AMOUNT, ROW_CURRENT, {
+                width: TAB_EXPENSES_DETAIL.LAST - TAB_EXPENSES_DETAIL.AMOUNT,
+                align: 'right'
+            });
+    }
+
+function addHilightExpenceDetail(position, row_height) {
+
+        dailyReport.rect(TAB_TABLE_EXPENSES_DETAIL
+            .INDEX, position, (TAB_TABLE_EXPENSES_DETAIL.LAST - TAB_TABLE_EXPENSES_DETAIL.INDEX), row_height).fill('#ddd');
+
+        dailyReport.fill('black');
     }
 
     function checkPositionOutsideArea() {
