@@ -18,7 +18,6 @@ var TEXT_SPACE = FONT_SIZE + TEXT_SPACE_LOWER;
 var ROW_CURRENT = ROW_DEFAULT;
 var hilight = false;
 var row_hilight = 0;
-var row_p1 = ROW_DEFAULT;
 var totalchartnewlinespace = FONT_SIZE_BIG + TEXT_SPACE_LOWER
 var ExpensesGroupFiltered;
 var ExpensesItemFiltered;
@@ -59,26 +58,6 @@ var TAB_ITEMS = {
     LAST: TAB_TABLE.LAST + 5
 }
 
-var TAB_TABLE_TOPPING_GROUP = {
-    INDEX: 45,
-    QUANTITY: 235,
-    LAST: 305,
-}
-
-var TAB_TABLE_TOPPING = {
-    INDEX: 45,
-    NAME: 65,
-    QUANTITY: 235,
-    LAST: 305,
-}
-
-var TAB_TOPPING = {
-    INDEX: TAB_TABLE_TOPPING.INDEX + 5,
-    NAME: TAB_TABLE_TOPPING.NAME + 5,
-    QUANTITY: TAB_TABLE_TOPPING.QUANTITY + 5,
-    LAST: TAB_TABLE_TOPPING.LAST - 5,
-}
-
 var TAB_TABLE_EXPENSES_GROUP = {
     INDEX: 45,
     AMOUNT: 235,
@@ -115,25 +94,6 @@ var TAB_EXPENSES_DETAIL = {
     INDEX: TAB_TABLE_EXPENSES_DETAIL.INDEX + 5,
     AMOUNT: 235 + 5, //fixcode
     LAST: TAB_TABLE_EXPENSES_DETAIL.LAST - 5
-}
-
-var TAB_TABLE_CHART_TOTAL = {
-    NAME: 45,
-    LAST: 300
-}
-
-var TAB_CHART_TOTAL = {
-    NAME: TAB_TABLE_CHART_TOTAL.NAME + 5,
-    LAST: TAB_TABLE_CHART_TOTAL.LAST - 5
-}
-
-var TAB_TABLE_CHART_DETAIL = {
-    NAME: 330,
-    LAST: 545
-}
-var TAB_CHART_DETAIL = {
-    NAME: TAB_TABLE_CHART_DETAIL.NAME + 5,
-    LAST: TAB_TABLE_CHART_DETAIL.LAST - 5
 }
 
 //----------main---
@@ -205,7 +165,7 @@ function Report(pathPdf, data) {
         NewLine(FONT_SIZE_HEADER + TEXT_SPACE);
 
         dailyReport.fontSize(FONT_SIZE_BIG)
-            .text("From : " +dateFrom, TAB_TABLE
+            .text("From : " + dateFrom, TAB_TABLE
                 .INDEX, ROW_CURRENT, {
                 width: TAB_TABLE
                     .LAST - TAB_TABLE
@@ -238,7 +198,7 @@ function Report(pathPdf, data) {
             });
 
         dailyReport.fillColor('black');
-        
+
         NewLine(TEXT_SPACE + 5);
 
     }
@@ -332,18 +292,18 @@ function Report(pathPdf, data) {
 
         else {
 
-             NewLine(TEXT_SPACE);
+            NewLine(TEXT_SPACE);
 
-             dailyReport.fontSize(FONT_SIZE_HEADER)
-            .text("Detail", TAB_TABLE
-                .INDEX, ROW_CURRENT, {
-                width: TAB_TABLE
-                    .LAST - TAB_TABLE
-                    .INDEX,
-                align: 'left'
-            });
+            dailyReport.fontSize(FONT_SIZE_HEADER)
+                .text("Detail", TAB_TABLE
+                    .INDEX, ROW_CURRENT, {
+                    width: TAB_TABLE
+                        .LAST - TAB_TABLE
+                        .INDEX,
+                    align: 'left'
+                });
 
-        NewLine(TEXT_SPACE + 5);
+            NewLine(TEXT_SPACE + 5);
 
             _.forEach(ExpensesGroupFiltered, function (expgroug, key) {
 
@@ -362,36 +322,43 @@ function Report(pathPdf, data) {
 
                 checkPositionOutsideArea();
 
-                ExpensesItemFiltered = _.filter(expgroug.Items, function (c) {
-                    return c.Amount != 0 && c.Quantity != 0;
-                });
+                    ExpensesItemFiltered = _.filter(expgroug.Items, function (c) {
+                        return c.Amount != 0 && c.Quantity != 0
+                    });
 
-                _.forEach(ExpensesItemFiltered, function (expitem, key) {
+                    if(expgroug.Items[0].DateTime == expgroug.DateTime){
 
-                    if (((key + 1) % 2) == 1) {
+                    }else{
 
-                        addHilightExpenceDetail(ROW_CURRENT, TEXT_SPACE);
 
-                    }
+                    _.forEach(ExpensesItemFiltered, function (expitem, key) {
 
-                    addTableLine(TAB_TABLE_EXPENSES_DETAIL_GROUP
-                        .INDEX, ROW_CURRENT, TAB_TABLE_EXPENSES_DETAIL_GROUP
-                            .LAST, ROW_CURRENT); //row line
+                        if (((key + 1) % 2) == 1) {
 
-                    addExpensesDetailItems(expgroug,expitem, key);//--text
+                            addHilightExpenceDetail(ROW_CURRENT, TEXT_SPACE);
 
-                    _.forEach(TAB_TABLE_EXPENSES_DETAIL
-                        , function (value, key) {
-                            addColumnLine(value);
-                        })
+                        }
 
-                    NewLine(TEXT_SPACE);
+                        addTableLine(TAB_TABLE_EXPENSES_DETAIL_GROUP
+                            .INDEX, ROW_CURRENT, TAB_TABLE_EXPENSES_DETAIL_GROUP
+                                .LAST, ROW_CURRENT); //row line
 
-                    addTableLine(TAB_TABLE_EXPENSES_DETAIL
-                        .INDEX, ROW_CURRENT, TAB_TABLE_EXPENSES_DETAIL
-                            .LAST, ROW_CURRENT); //row line
+                        addExpensesDetailItems(expitem, key);//--text
 
-                });
+                        _.forEach(TAB_TABLE_EXPENSES_DETAIL
+                            , function (value, key) {
+                                addColumnLine(value);
+                            })
+
+                        NewLine(TEXT_SPACE);
+
+                        addTableLine(TAB_TABLE_EXPENSES_DETAIL
+                            .INDEX, ROW_CURRENT, TAB_TABLE_EXPENSES_DETAIL
+                                .LAST, ROW_CURRENT); //row line
+
+                    });
+
+                }
 
                 NewLine(TEXT_SPACE);
 
@@ -431,33 +398,33 @@ function Report(pathPdf, data) {
 
     }
 
-        function drawFooter() {
+    function drawFooter() {
 
-            //--footerGrandtotal
-            NewLine(FONT_SIZE_HEADER + TEXT_SPACE_LOWER * 2);
+        //--footerGrandtotal
+        NewLine(FONT_SIZE_HEADER + TEXT_SPACE_LOWER * 2);
 
-            dailyReport.fontSize(FONT_SIZE_HEADER)
-                .text("ยอดสุทธิ", TAB_TABLE
-                    .INDEX, ROW_CURRENT, {
-                    width: TAB_TABLE
-                        .QUANTITY - TAB_TABLE
-                        .INDEX,
-                    align: 'left'
-                })
+        dailyReport.fontSize(FONT_SIZE_HEADER)
+            .text("ยอดสุทธิ", TAB_TABLE
+                .INDEX, ROW_CURRENT, {
+                width: TAB_TABLE
+                    .QUANTITY - TAB_TABLE
+                    .INDEX,
+                align: 'left'
+            })
 
-            footerGrandtotal = data.GrandTotal - data.Expense
+        footerGrandtotal = data.GrandTotal - data.Expense
 
-            dailyReport.text("฿ " + numberWithCommas2(footerGrandtotal), TAB_TABLE
-                .AMOUNT, ROW_CURRENT, {
-                    width: TAB_TABLE
-                        .LAST - TAB_TABLE
-                        .AMOUNT,
-                    align: 'right'
-                });
+        dailyReport.text("฿ " + numberWithCommas2(footerGrandtotal), TAB_TABLE
+            .AMOUNT, ROW_CURRENT, {
+                width: TAB_TABLE
+                    .LAST - TAB_TABLE
+                    .AMOUNT,
+                align: 'right'
+            });
 
-            NewLine(FONT_SIZE_HEADER + TEXT_SPACE_LOWER * 2);
+        NewLine(FONT_SIZE_HEADER + TEXT_SPACE_LOWER * 2);
 
-        }
+    }
     function addTotalchart() {
 
         row_p1 += TEXT_SPACE_LOWER;
@@ -704,28 +671,28 @@ function Report(pathPdf, data) {
 
     }
 
-        function addExpensesDetailGroups(Expensesgroup) {
+    function addExpensesDetailGroups(Expensesgroup) {
 
         dailyReport.fontSize(FONT_SIZE)
-            .text( dateFormat(Expensesgroup.DateTime, "dd mmmm yyyy"), TAB_EXPENSES_DETAIL.INDEX, ROW_CURRENT)
-            .text("฿ " + numberWithCommas(Expensesgroup.Amount), TAB_EXPENSES_DETAIL.AMOUNT, ROW_CURRENT,{
+            .text(dateFormat(Expensesgroup.DateTime, "dd mmmm yyyy"), TAB_EXPENSES_DETAIL.INDEX, ROW_CURRENT)
+            .text("฿ " + numberWithCommas(Expensesgroup.Amount), TAB_EXPENSES_DETAIL.AMOUNT, ROW_CURRENT, {
                 width: TAB_EXPENSES_DETAIL.LAST - TAB_EXPENSES_DETAIL.AMOUNT,
                 align: 'right'
             });
 
     }
 
-       function addExpensesDetailItems(Expensesgroup,item, key) {
+    function addExpensesDetailItems(item, key) {
         dailyReport.fontSize(FONT_SIZE)
-            
-            .text("    "+Expensesgroup.Name+" -- "+item.Name, TAB_EXPENSES_DETAIL.INDEX, ROW_CURRENT)
+
+            .text("    " + item.GroupName + " -- " + item.Name, TAB_EXPENSES_DETAIL.INDEX, ROW_CURRENT)
             .text("฿ " + numberWithCommas(item.Amount), TAB_EXPENSES_DETAIL.AMOUNT, ROW_CURRENT, {
                 width: TAB_EXPENSES_DETAIL.LAST - TAB_EXPENSES_DETAIL.AMOUNT,
                 align: 'right'
             });
     }
 
-function addHilightExpenceDetail(position, row_height) {
+    function addHilightExpenceDetail(position, row_height) {
 
         dailyReport.rect(TAB_TABLE_EXPENSES_DETAIL
             .INDEX, position, (TAB_TABLE_EXPENSES_DETAIL.LAST - TAB_TABLE_EXPENSES_DETAIL.INDEX), row_height).fill('#ddd');

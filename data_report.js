@@ -20,6 +20,7 @@ var data = {
       Items: [
         {
           Name: "แก็ซ",
+          GroupName:"สาธารูปโภค",
           Quantity: 1,
           Amount: 4200,
           Percent: 0.893617034,
@@ -28,6 +29,7 @@ var data = {
         },
         {
           Name: "ไฟฟ้า",
+          GroupName:"สาธารูปโภค",
           Quantity: 1,
           Amount: 500,
           Percent: 0.106382981,
@@ -46,6 +48,7 @@ var data = {
       Items: [
         {
           Name: "item1",
+          GroupName: "Group2",
           Quantity: 1,
           Amount: 4200,
           Percent: 0.893617034,
@@ -54,6 +57,7 @@ var data = {
         },
         {
           Name: "item2",
+          GroupName: "Group2",
           Quantity: 1,
           Amount: 500,
           Percent: 0.106382981,
@@ -72,6 +76,7 @@ var data = {
       Items: [
         {
           Name: "item1",
+          GroupName: "Group 3",
           Quantity: 1,
           Amount: 4200,
           Percent: 0.893617034,
@@ -80,6 +85,7 @@ var data = {
         },
         {
           Name: "item2",
+          GroupName: "Group 3",
           Quantity: 1,
           Amount: 500,
           Percent: 0.106382981,
@@ -88,6 +94,7 @@ var data = {
         },
                {
           Name: "item3",
+          GroupName: "Group 3",
           Quantity: 1,
           Amount: 500,
           Percent: 0.106382981,
@@ -95,24 +102,16 @@ var data = {
           Type: null
         },       {
           Name: "item4",
+          GroupName: "Group 3",
           Quantity: 1,
           Amount: 500,
           Percent: 0.106382981,
           Items: null,
           Type: null
-        }
-      ],
-      Type: null
-    }
-    ,{
-            Name: "สาธารูปโภค",
-      Quantity: 2,
-      Amount: 4700,
-      Percent: 1,
-      DateTime: "2017-04-03T17:38:36.0417225+07:00",
-      Items: [
+        },
         {
           Name: "แก็ซ",
+          GroupName: "สาธารูปโภค",
           Quantity: 1,
           Amount: 4200,
           Percent: 0.893617034,
@@ -121,16 +120,17 @@ var data = {
         },
         {
           Name: "ไฟฟ้า",
+          GroupName: "สาธารูปโภค",
           Quantity: 1,
           Amount: 500,
           Percent: 0.106382981,
           Items: null,
           Type: null
         }
+
       ],
       Type: null
     }
-
   ]
 }
 exports.a = data;
