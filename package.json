@@ -1,6 +1,6 @@
 {
   "name": "expenses_report",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "สร้างรายงานค่าใช้จ่าย\r",
   "main": "index.js",
   "dependencies": {
